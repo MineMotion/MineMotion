@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>MineMotion</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Principal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/examples/js/controls/TransformControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <!-- Loaders -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    
+    <!-- Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/animation/CCDIKSolver.js"></script>
+    
+    <!-- Pickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr"></script>
+    
+    <!-- Post Processing -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/postprocessing/SSAOPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/shaders/SSAOShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/postprocessing/OutlinePass.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/SSRPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/math/SimplexNoise.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/shaders/DepthOfFieldShader.js"></script>
+    
+</head>
+
+<body>
+  <!-- Viewport -->
+  <div id="viewport" class="viewport"></div>
+  
+  <!-- Feedback Elements -->
+  <span class="infoText"></span>
+  <span class="objectName"></span>
+  <div onclick="hide()" class="overlay"></div>
+  
+  <!-- Projects Menu -->
+  <div id="projectMenu" class="menu projects">
+    
+    <img class="logo" src="icons/logo.png">
+    
+    <h1 class="title">MineMotion v1.0</h1>
+    <h4>Projects</h4>
+    
+    <div id="projectList" class="project-list"></div>
+    
+    <button onclick="hide()" class="new-project">+ Create Project</button>
+    
+  </div>
+  
+  <!-- Creation Menu -->
+  <button onclick="toggle('creationMenu')" class="create"><img src="icons/craft.png"></button>
+  <div id="creationMenu" class="creation-menu menu">
+    Craft 3D Objects
+    <hr>
+    Characters
+    <div class="section">
+      <div onclick="importCharacter('Steve')" class="section-item">
+        <img src="textures/Steve.png">
+        <span>Steve</span>
+        </div>
+    </div>
+    <hr>
+    Blocks
+    <div class="section">
+      <div onclick="toggle('textureSelector'), blockList()" class="section-item">
+        <img src="images/block.jpg">
+        <span>Block</span>
+      </div>
+      <div onclick="toggle('textureSelector'), stairList()" class="section-item">
+        <img src="images/stair.jpg">
+        <span>Stair</span>
+      </div>
+      <div onclick="toggle('textureSelector'), slabList()" class="section-item">
+        <img src="images/slab.jpg">
+        <span>Slab</span>
+      </div>
+    </div>
+    <hr>
+    Lights
+    <div onclick="point()" class="section">
+      <div class="section-item">
+        <img src="icons/Point.png">
+        <span>Point</span>
+      </div>
+      <div onclick="sun()" class="section-item">
+        <img src="icons/Sun.png">
+        <span>Sun</span>
+      </div>
+      <div onclick="spot()" class="section-item">
+        <img src="icons/Spot.png">
+        <span>Spot</span>
+      </div>
+    </div>
+    <hr>
+    Worlds
+    <div class="line">
+      
+    </div>
+    <div class="line">
+      <button onclick="importModel()">Import World (obj)</button>
+    </div>
+  </div>
+  <div class="undoRedoButtons">
+    <button id="undo"><img src="icons/Undo.png"></button>
+    <button id="redo"><img src="icons/Redo.png"></button>
+  </div>
+  
+  <!-- Texture Selector -->
+  <div id="textureSelector" class="menu texture-selector">
+    Select texture
+    <hr>
+    <div id="textureList" class="grid"></div>
+  </div>
+  
+  <!-- TransformControls and actions -->
+  <div class="transform-controls">
+    <button id="pos"><img src="icons/Position.png"></button>
+    <button id="rot"><img src="icons/Rotation.png"></button>
+    <button id="scl"><img src="icons/Scale.png"></button>
+    <br>
+    <button id="space" class="space">Local</button>
+    <button id="snap" class="snap">Snap</button>
+  </div>
+  <div class="actions">
+    <button onclick="deleteObject()"><img src="icons/Delete.png"></button>
+    <button onclick="copyObject()"><img src="icons/Copy.png"></button>
+    <button onclick="hideObject()"><img src="icons/Hide.png"></button>
+  </div>
+  
+  <!-- Extra tool buttons -->
+  <div>
+    <button onclick="toggle('configMenu'), overlay()" class="config-button"><img src="icons/Configs.png">Config</button>
+  
+    <button onclick="toggle('sceneMenu')" class="scene-button"><img src="icons/Scene.png">Scene</button>
+    
+    <button onclick="toggleOutliner()" class="outliner-button"><img src="icons/Outliner.png"></button>
+    
+    <button onclick="collectionMode()" class="collection-button"><img src="icons/Collection-mode.png"></button>
+    
+    <button onclick="toggle('renderMenu'), render()" class="render-button">Render</button>
+  </div>
+  
+  <button onclick="preview()" class="preview-button"><img src="icons/Preview.png"></button>
+  
+  <!-- Outliner -->
+  <div id="outliner" class="outliner"></div>
+  
+  <!-- Scene, Configs, Render menus -->
+  <div id="configMenu" class="menu">
+    Configurations 
+    <hr>
+    Snap Grid
+    <div class="line">
+      Auto-Snap
+      <input id="autoSnap" checked type="checkbox">
+    </div>
+    <div class="line">
+      Position step:
+      <input id="positionStep" class="number" type="number">
+    </div>
+    <div class="line">
+      Rotation step:
+      <input id="rotationStep" class="number" type="number">
+    </div>
+    <div class="line">
+      Scale step:
+      <input id="scaleStep" class="number" type="number">
+    </div>
+    <hr>
+    Lights
+    <div class="line">
+      Light preview
+      <input id="lightPreview" checked type="checkbox">
+    </div>
+    <hr>
+    Viewport quality
+    <div class="line">
+      <button id="qualityLow">Low</button>
+      <button id="qualityMid">Mid</button>
+      <button id="qualityHigh">High</button>
+      <button id="qualityUltra">Ultra</button>
+    </div>
+    Render distance
+    <div class="line">
+      <button id="distance500">500m</button>
+      <button id="distance1200">1200m</button>
+      <button id="distance3000">3000m</button>
+    </div>
+    <hr>
+    Navigation
+    <div class="line">
+      Rotation Velocity:
+      <input id="rotationVelocity" value="0.5" class="number" type="number"/>
+    </div>
+    <div class="line">
+      Damping:
+      <input id="damping" value="0.5" class="number" type="number"/>
+    </div>
+</div>
+  <div id="sceneMenu" class="menu">
+    <b>Projects</b>
+    <div class="line">
+      <button onclick="saveProject()">Save</button>
+      <button onclick="toggle('projectMenu'), overlay()">Home</button>
+    </div>
+    <hr>
+    Scene Adjust
+    <hr>
+    Time Presets
+    <div class="section">
+      <div id="timeDefault" class="section-item">
+        <img src="images/default.png">
+        <span>Default</span>
+      </div>
+      <div id="timeSunrise" class="section-item">
+        <img src="images/sunrise.png">
+        <span>Sunrise</span>
+      </div>
+      <div id="timeDay" class="section-item">
+        <img src="images/day.png">
+        <span>Day</span>
+      </div>
+      <div id="timeAfternoon" class="section-item">
+        <img src="images/afternoon.png">
+        <span>Afternoon</span>
+      </div>
+      <div id="timeSunset" class="section-item">
+        <img src="images/sunset.png">
+        <span>Sunset</span>
+      </div>
+      <div id="timeNight" class="section-item">
+        <img src="images/night.png">
+        <span>Night</span>
+      </div>
+    </div>
+    <hr>
+    Global Light
+    <br>
+    <div class="line">
+      Intensity:
+      <input id="globalIntensity" value="1" class="number" type="number" min="0" max="5" step="0.1">
+    </div>
+    <div class="line">
+      Color:
+      <div class="color">
+        <div id="colorPicker" class="color-picker"></div>
+      </div>
+    </div>
+    <hr>
+    Sky
+    <div class="line">
+      360° Texture:
+      <input id="skyTexture" type="file" accept="image/*">
+    </div>
+    <div class="line">
+      Clouds:
+      <input id="toggleClouds" checked type="checkbox">
+    </div>
+  </div>
+   <div id="animationMenu" class="menu animation-menu">
+   Animation tools
+   <div class="line">
+     Autokey
+     <input id="autokeyEnabled" type="checkbox">
+   </div>
+   <div style="display: none" class="line">
+    Frames
+    <input type="number" id="totalFramesInput" value="250" min="1" step="1">
+   </div>
+ </div>
+  <div id="renderMenu" class="menu">
+    Render
+    <hr>
+    <div id="renderedVideo" class="output">
+      <img id="renderedImage">
+    </div>
+    <hr>
+    <div class="line">
+      <button onclick="renderVideo()">Render</button>
+      <button onclick="playRenderedVideo()">Play</button>
+    </div>
+    <hr>
+    <b>Postprocessing</b>
+    
+    <input hidden id="postprocessing" type="checkbox">
+    
+    <div class="line">
+      <span class="mini">Ambient Occlusion</span>
+      <input id="ambientOcclusion" type="checkbox">
+    </div>
+    <div class="line">
+      <span class="mini">Unreal Bloom</span>
+      <input id="bloom" type="checkbox">
+    </div>
+    
+    <hr>
+    <div class="line">
+      <button onclick="saveAs()">Save As</button>
+      <button onclick="share()">Share</button>
+    </div>
+</div>
+  
+  <!-- Object Tools -->
+  <button onclick="editMenu()" class="edit-button"><img src="icons/edit.png"></button>
+  
+  <div id="blockMenu" class="menu edit-menu">
+    Edit Block
+    <hr>
+    <div class="line">
+      <button onclick="toggle('textureSelector'), textureList()">Texture</button>
+    </div>
+    <hr>
+    Variants
+    <br>
+    <span class="mini">block</span>
+    <div class="line">
+      <button onclick="variant(1, 'block')">1</button>
+    </div>
+    <span class="mini">stair</span>
+    <div class="line">
+      <button onclick="variant(1, 'stair')">1</button>
+      <button onclick="variant(2, 'stair')">2</button>
+      <button onclick="variant(3, 'stair')">3</button>
+    </div>
+    <span class="mini">slab</span>
+    <div class="line">
+      <button onclick="variant(1, 'slab')">1</button>
+      <button onclick="variant(2, 'slab')">2</button>
+      
+    </div>
+    <hr>
+    Custom Texture
+    <div class="line">
+      <button onclick="customTexture()">Import</button>
+    </div>
+  </div>
+  <div id="lightMenu" class="menu edit-menu">
+    Edit light
+    <hr>
+    <div class="line">
+      <span>Intensity:</span>
+      <input id="lightIntensity" type="number">
+    </div>
+    <div class="line">
+      <span>Color:</span>
+      <div class="color">
+        <div id="lightColor" class="color-picker"></div>
+      </div>
+    </div>
+    <hr>
+    Shadows
+    <div class="line">
+      <span>Enabled:</span>
+      <input checked id="enableShadows" type="checkbox">
+    </div>
+    <div class="line">
+      <span>Softness:</span>
+      <input id="shadowSoftness" type="number">
+    </div>
+    <hr>
+    <div class="line">
+        <span>Distance:</span>
+        <input id="lightDistance" type="number">
+      </div>
+    <div class="line">
+        <span>Angle:</span>
+        <input id="lightAngle" type="number">
+      </div>
+    <div class="line">
+        <span>Bias:</span>
+        <input id="lightBias" type="number" step="0.0001">
+      </div>
+  </div>
+  <div id="boneMenu" class="menu edit-menu">
+    Edit bone 
+    <hr>
+    <b>IK Rig</b>
+    <div class="line">
+      <button onclick="setEffector()">Set Ik</button>
+    </div>
+    <hr>
+    <b>Constraints:</b>
+    Rotation
+    <div class="line">
+      <span id="rotMin" class="mini">Min: </span>
+      <span id="rotMax" class="mini">Max: </span>
+    </div>
+    <div class="line">
+      <button onclick="setRotMin()">Min</button>
+      <button onclick="setRotMax()">Max</button>
+    </div>
+    Position
+    <div class="line">
+      <span id="posMin" class="mini">Min: </span>
+      <span id="posMax" class="mini">Max: </span>
+    </div>
+    <div class="line">
+      <button onclick="setPosMin()">Min</button>
+      <button onclick="setPosMax()">Max</button>
+    </div>
+    Scale
+    <div class="line">
+      <span id="scaleMin" class="mini">Min: </span>
+      <span id="scaleMax" class="mini">Max: </span>
+    </div>
+    <div class="line">
+      <button onclick="setScaleMin()">Min</button>
+      <button onclick="setScaleMax()">Max</button>
+    </div>
+  </div>
+  <div id="meshMenu" class="menu edit-menu">
+    Edit Mesh
+    <hr>
+    <div class="line">
+      <button onclick="customTexture()">Texture</button>
+    </div>
+  </div>
+  
+  <div hidden id="debug">
+    Debug
+  </div>
+  
+  <!-- Animation -->
+  <div class="animationMode">
+    
+    <div class="animation-tools">
+      
+      <button onclick="addKeyframe()" id="addKeyframe"><img src="icons/addKeyframe.png"></button>
+      
+      <button onclick="toggle('animationMenu')">^</button>
+      <input id="currentFrame" type="number">
+  
+      <div>
+        <button onclick="copyKeyframe()"><img src="icons/Copy.png"></button>
+        <button onclick="pasteKeyframe()"><img src="icons/Paste.png"></button>
+      </div>
+      
+      <div>
+        <button id="rewind"><img src="icons/Rewind.png"></button>
+        <button id="playPause"><img src="icons/Play.png"></button>
+        <button id="forward"><img src="icons/Forward.png"></button>
+      </div>
+      
+    </div>
+    <div class="timeline">
+      <div class="frames-container"></div>
+      <div class="cursor"></div>
+    </div>
+  </div>
+  
+</body>
+
+<script src="main.js"></script>
+<script src="scene.js"></script>
+<script src="import.js"></script>
+<script src="selection.js"></script>
+<script src="transform.js"></script>
+<script src="animation.js"></script>
+<script src="rigging.js"></script>
+<script src="actions.js"></script>
+<script src="outliner.js"></script>
+<script src="configurations.js"></script>
+<script src="undo_redo.js"></script>
+<script src="saving.js"></script>
+
+</html>
+

@@ -1,0 +1,801 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Minecraftia", sans-serif;
+  font-size: 12px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  
+  transition: filter ease 0.05s;
+  
+  border: solid 0px;
+}
+
+body {
+  background: #000000;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+button {
+  display: inline-flex;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  border: none;
+  background: none;
+  vertical-align: middle;
+}
+
+img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+  display: block;
+}
+button, .menu {
+  padding: 3px;
+  color: #C7C7C7;
+  margin: 2px;
+  
+  border: 4px solid transparent;
+  border-image-source: url("icons/background.png");
+  border-image-slice: 1 fill;
+}
+button:active {
+  filter: brightness(1.4);
+}
+
+.active {
+  border: 4px solid transparent;
+  border-image-source: url("icons/background-active.png");
+  border-image-slice: 1 fill;
+  color: #FFFFFF;
+}
+
+hr {
+  margin: 8px 0;
+  border: solid 1px #2B2B2B;
+}
+
+b {
+  color: #FFFFFF;
+}
+
+input[type="number"], input[type="file"] { height: 25px;
+  width: 50px;
+  background: #1C1C1C;
+  color: #B6B6B6;
+  text-align: center;
+  outline: none;
+  margin: 5px;
+  padding: 2px;
+  border-radius: 3px;
+  border: 1px solid #444;
+  font-size: 10px;
+  border: 2px solid transparent;
+  border-image-source: url("icons/background.png");
+  border-image-slice: 1 fill;
+}
+input[type="file"]::file-selector-button {
+  position: relative;
+  background: #202020;
+  color: #B6B6B6;
+  border: none;
+  top: -2px;
+  left: -6px;
+  height: 20px;
+  font-family: Minecraftia;
+}
+.color {
+  position: relative;
+  width: 38px;
+  height: 100%;
+  top: -3px;
+}
+input[type="checkbox"] {
+  appearance: none;
+  width: 40px;
+  min-width: 40px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-image-source: url("icons/background.png");
+  border-image-slice: 1 fill;
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 5px;
+}
+input[type="checkbox"]:checked {
+}
+input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  background: #C6C6C6;
+  border: 3px solid transparent;
+  border-image-source: url("icons/background-active.png");
+  border-image-slice: 1 fill;
+  border-radius: 2px;
+  transform: translateY(-50%);
+  transition: left 0.2s;
+}
+input[type="checkbox"]:checked::before {
+  left: 22px;
+}
+
+@font-face {
+  font-family: "Minecraftia";
+  src: url("fonts/Minecraftia-Regular.ttf") format("truetype");
+}
+
+.viewport {
+  width: 100%;
+  height: 100vh;
+  background: #787878;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Menu and Sections */
+.menu {
+  display: none;
+  position: absolute;
+  width: 250px;
+  height: 300px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+  text-align: center;
+  justify-content: center;
+  z-index: 7;
+  overflow-y: auto;
+  
+  animation: fade-in 0.2s ease forwards;
+}
+
+.x {
+  position: fixed;
+  top: 3px;
+  right: 3px;
+  border-image-source: url("icons/background-red.png");
+  width: 22px;
+  height: 22px;
+}
+
+.section {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  height: 80px;
+  background: #171717;
+  justify-content: space-around;
+  padding: 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: 1px;
+  -ms-overflow-style: none;
+}
+.section::-webkit-scrollbar {
+  display: none;
+}
+.section-item {
+  flex: 0 0 auto;
+  width: 70px;
+  height: 70px;
+  background: #282828;
+  margin-right: 5px;
+  position: relative;
+}
+.section-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.section-item span {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  background: #0000009C;
+  padding: 2px 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 4px;
+  width: 100%;
+  height: 85%;
+  background: #171717;
+  padding: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-content: start;
+}
+.grid-item {
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  background: #282828;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scale(4);
+  transform-origin: top left;
+}
+.grid-item span {
+  width: 100%;
+  text-align: center;
+  font-size: 7px;
+  background: #0000009C;
+  padding: 2px 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.mini {
+  width: 100%;
+  font-size: 10px;
+  color: #7E7E7E;
+  background: #272727AB;
+}
+
+.overlay {
+  position: absolute;
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #000000E0;
+  z-index: 6;
+  
+  animation: fade-in 0.3s ease forwards;
+}
+
+.line {
+  display: flex;
+  width: 100%;
+  height: 35px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  background-color: #272727;
+}
+.line button {
+  width: 100%;
+  margin: 0;
+}
+.line .mini {
+  display: flex;
+  justify-content: left;
+}
+
+/* Project Screen */
+.projects {
+  display: none;
+  width: 320px;
+  height: 400px;
+}
+.logo {
+  width: 35px;
+  height: 35px;
+  position: fixed;
+  left: 10px;
+  top: 10px;
+}
+.title {
+  color: #C7C7C7;
+  font-size: 16px;
+}
+.project-list {
+  position: fixed;
+  display: flex;
+  left: 50%;
+  top: 50%;
+  transform:  translate(-50%, -50%);
+  width: 95%;
+  height: 60%;
+  background-color: #181818;
+  overflow-x: auto;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.project {
+  width: 80px;
+  height: 80px;
+  margin: 8px;
+}
+.project img {
+  width: 100%;
+  height: 100%;
+}
+.project-name {
+  background-color: #222222C9;
+  position: relative;
+  width: 100%;
+  top: -20px;
+  font-size: 10px;
+  padding: 2px;
+  height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.new-project {
+  position: fixed;
+  left: 50%;
+  height: 40px;
+  bottom: 4px;
+  transform: translate(-50%);
+}
+
+/* Create, Controls and Menus */
+.create {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+}
+.creation-menu {
+  top: 70px;
+  left: 5px;
+  transform: translate(0);
+}
+
+.undoRedoButtons {
+  position: absolute;
+  width: 60px;
+  height: 28px;
+  top: 72px;
+  left: 7px;
+  background: #1B1B1BB0;
+}
+.undoRedoButtons button {
+  margin: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.transform-controls {
+  position: absolute;
+  top: 5px;
+  left: 70px;
+}
+.transform-controls button {
+  height: 30px;
+  width: 30px;
+  margin: 2.5px;
+}
+.transform-controls .space{
+  width: 50px;
+  height: 25px;
+  padding: 0;
+}
+.transform-controls .snap {
+  width: 50px;
+  height: 25px;
+  padding: 0;
+}
+
+.actions {
+  display: none;
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.actions button {
+  height: 30px;
+  width: 30px;
+  margin: 2.5px;
+}
+
+.objectName { 
+  position: absolute;
+  bottom: 95px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: #FFFFFF85;
+}
+.infoText {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: #FFFFFFBA;
+}
+
+.config-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 80px;
+  height: 25px;
+}
+.scene-button {
+  position: absolute;
+  top: 35px;
+  right: 5px;
+  width: 80px;
+  height: 30px;
+}
+
+.outliner-button, .collection-button, .render-button, .preview-button {
+  position: absolute;
+  top: 5px;
+  right: 90px;
+  width: 30px;
+  height: 30px;
+  z-index: 5;
+}
+.collection-button {
+  right: 125px;
+}
+.render-button {
+  width: 65px;
+  height: 25px;
+  top: 40px;
+}
+.preview-button {
+  top: 70px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+}
+
+.edit-button {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  left: 5px;
+  top: 102px;
+}
+
+.edit-menu {
+  left: 5px;
+  top: 135px;
+  width: 150px;
+  transform: translate(0);
+  opacity: 0.9;
+}
+
+#lightMenu span {
+  font-size: 9px;
+}
+
+.outliner {
+  position: absolute;
+  display: none;
+  width: 150px;
+  height: 200px;
+  background-color: #22222296;
+  top: 72px;
+  right: 7px;
+  overflow: auto;
+  padding: 5px;
+  z-index: 4;
+  
+  animation: enter-from-top 0.1s ease-out forwards;
+}
+.outliner-item {
+  width: 200px;
+  height: 20px;
+  background-color: #212121D1;
+  margin-bottom: 2px;
+  font-size: 10px;
+  padding: 2px 2px 2px 20px;
+  position: relative;
+  align-content: center;
+}
+.outliner-edit {
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+  outline: none;
+  background: transparent;
+}
+.collapse {
+  position: absolute;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  font-size: 8px;
+  border: none;
+  background: none;
+}
+
+#renderMenu {
+  width: calc(100% - 10%);
+  height: calc(100% - 30%);
+}
+.output {
+  display: flex;
+  width: 100%;
+  height: 300px;
+  background: #1A1A1A;
+  justify-content: center;
+  align-items: center;
+}
+.output button {
+  width: 70%;
+  height: auto;
+}
+.renderedImage {
+  width: auto;
+  height: 100%;
+  left: 0;
+}
+
+/* Animation */
+.animationMode {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  background-color: #363636;
+  flex-direction: column;
+}
+.animation-menu {
+  left: 0;
+  top: auto;
+  bottom: 100px;
+  width: 150px;
+  height: 100px;
+  transform: none;
+}
+.animation-menu * {
+  font-size: 10px;
+}
+.animation-tools {
+  display: flex;
+  justify-content: space-between;
+  background-color: #2D2D2D;
+}
+.timeline {
+  position: absolute;
+  height: 50px;
+  background-color: #252525;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+  bottom: 10px;
+  padding: 0 10px;
+}
+.frames-container {
+  position: absolute;
+  width: max-content;
+  height: 100%;
+  
+}
+.frame {
+  position: absolute;
+  width: 2px;
+  height: 80%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #575757;
+  pointer-events: none;
+}
+.frame:nth-child(5n + 1) {
+  background-color: #7B7B7B;
+  height: 90%;
+}
+.cursor {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  left: 9px;
+  background-color: #FF0000;
+  transform: translateX(0);
+}
+.keyframe {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  rotate: 45deg;
+  background: #FFFFFF;
+  top: 40%;
+  transform: translateX(-50%);
+  
+  animation: fade-in 0.1s ease forwards;
+}
+#addKeyframe{ 
+  position: absolute;
+  right: 5px;
+  bottom: 105px
+}
+
+
+#debug {
+  position: absolute;
+  bottom: 160px;
+  left: 5px;
+  background: #3D3D3DAD;
+  padding: 8px;
+  font-size: 8px;
+}
+
+/* Keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes enter-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes enter-from-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+@keyframes exit-to-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes exit-to-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+@keyframes enter-from-top {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes enter-from-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes exit-to-top {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+@keyframes exit-to-bottom {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+
+/* Landscape Mode */
+@media screen and (orientation: landscape) {
+  .animationMode {
+    height: 72px;
+    background: #2222226B;
+  }
+  .animation-tools {
+    position: absolute;
+    background: transparent;
+    height: 30px;
+    width: 100%;
+    padding: 5px;
+    bottom: 45px;
+  }
+  .animation-tools button {
+    height: 27px;
+    margin: 2px;
+  }
+  .timeline {
+    height: 35px;
+    bottom: 2px;
+    background: #181818C2;
+  }
+  #addKeyframe {
+    bottom: 30px;
+  }
+  
+  .edit-menu { 
+    top: 5px;
+    bottom: 10px;
+    left: 40px;
+    height: 100%;
+    transform: translate(0%);
+  }
+  
+  .actions {
+    left: 5px;
+    bottom: 65px;
+    transform: translate(0%, -50%);
+  }
+  
+  .objectName {
+    bottom: 65px;
+  }
+  #debug {
+    bottom: 80px;
+    left: 100px;
+    z-index: 10;
+  }
+}
