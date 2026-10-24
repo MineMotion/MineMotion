@@ -4,6 +4,11 @@ on:
   push:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      dev:
+        description: Build APK that loads the Vite dev server at localhost:5173
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -25,6 +30,12 @@ jobs:
 
       - run: npm install
       - run: npm run build
+      - name: Dev server config
+        if: ${{ inputs.dev }}
+        run: |
+          jq '.server = {url: "http://localhost:5173", cleartext: true}' capacitor.config.json > cap.tmp
+          mv cap.tmp capacitor.config.json
+
       - run: npx cap add android
 
       - name: Apply native customizations
@@ -50,7 +61,8 @@ jobs:
           name: MineMotion-apk
           path: MineMotion.apk
 
-      - uses: softprops/action-gh-release@v2
+      - if: ${{ !inputs.dev }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
           name: MineMotion build ${{ github.run_number }}
