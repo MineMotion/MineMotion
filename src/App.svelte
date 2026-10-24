@@ -1,11 +1,12 @@
 <script>
-  import { app, currentProject } from './state/app.svelte.js'
-  import EditorScreen from './ui/EditorScreen.svelte'
-  import ProjectsScreen from './ui/ProjectsScreen.svelte'
+  import { mm } from './mm'
+
+  let canvas
+
+  $effect(() => {
+    mm.mount(canvas)
+    return () => mm.dispose()
+  })
 </script>
 
-{#if app.screen === 'editor'}
-  <EditorScreen project={currentProject()} />
-{:else}
-  <ProjectsScreen />
-{/if}
+<canvas bind:this={canvas}></canvas>
