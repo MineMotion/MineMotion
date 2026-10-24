@@ -1,12 +1,5 @@
 <script>
-  import { Engine } from './Engine'
-
-  let canvas
-
-  $effect(() => {
-    const engine = new Engine(canvas).init()
-    return () => engine.dispose()
-  })
+  import ProjectsScreen from './ui/ProjectsScreen.svelte'
 </script>
 
-<canvas bind:this={canvas}></canvas>
+<ProjectsScreen />
