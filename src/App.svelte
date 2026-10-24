@@ -1,11 +1,11 @@
 <script>
-  import { mm } from './mm'
+  import { Engine } from './Engine'
 
   let canvas
 
   $effect(() => {
-    mm.mount(canvas)
-    return () => mm.dispose()
+    const engine = new Engine(canvas).init()
+    return () => engine.dispose()
   })
 </script>
 
