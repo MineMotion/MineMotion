@@ -27,10 +27,14 @@ jobs:
       - run: npm run build
       - run: npx cap add android
 
-      - name: Apply icon and immersive activity
+      - name: Apply native customizations
         run: |
           cp -r resources/res/. android/app/src/main/res/
           cp resources/MainActivity.java android/app/src/main/java/com/minemotion/app/MainActivity.java
+          bash resources/patch-manifest.sh
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          mkdir -p ~/.android
+          cp resources/debug.keystore ~/.android/debug.keystore
 
       - run: npx cap sync android
 
