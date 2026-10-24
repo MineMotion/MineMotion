@@ -1,0 +1,6 @@
+{
+  "appId": "com.minemotion.app",
+  "appName": "MineMotion",
+  "webDir": "dist",
+  "backgroundColor": "#1e1f24"
+}
