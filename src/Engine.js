@@ -3,5 +3,5 @@ export class Engine {
     this.canvas = canvas
   }
 
-  init() 
+  init() {}
 }
