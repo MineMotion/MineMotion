@@ -1,1 +1,5 @@
-export cla
+export class name {
+  constructor(params) {
+    
+  }
+}
