@@ -1,21 +1,56 @@
 <script>
+  import { onMount } from 'svelte'
   import logo from '../assets/logo.png'
-  import NewProjectDialog from './NewProjectDialog.svelte'
+  import { ProjectStore } from '../projects/ProjectStore.js'
+  import ProjectDialog from './ProjectDialog.svelte'
   import Thumb from './Thumb.svelte'
   import { scenes } from './scenes.js'
 
-  let projects = $state([
-    { name: 'Creeper Walk', edited: 'Edited 12 min ago', cubes: scenes.creeper },
-    { name: 'Steve Run Cycle', edited: 'Edited yesterday', cubes: scenes.steve },
-    { name: 'Village Flyover', edited: 'Edited 3 days ago', cubes: scenes.village },
-    { name: 'Test Rig', edited: 'Edited Oct 12', cubes: scenes.cube, axes: true }
-  ])
-  let creating = $state(false)
+  let { onopen } = $props()
 
-  const create = (name) => {
-    projects.unshift({ name, edited: 'Edited just now', cubes: scenes.cube, axes: true })
-    creating = false
+  let projects = $state([])
+  let dialog = $state(null)
+  let menu = $state(null)
+  let armed = $state(false)
+  let error = $state('')
+
+  const refresh = async () => (projects = await ProjectStore.list())
+
+  const ago = (t) => {
+    const m = Math.floor((Date.now() - t) / 60000)
+    if (m < 1) return 'Edited just now'
+    if (m < 60) return `Edited ${m} min ago`
+    if (m < 1440) return `Edited ${Math.floor(m / 60)} h ago`
+    return `Edited ${new Date(t).toLocaleDateString('en', { month: 'short', day: 'numeric' })}`
   }
+
+  const toggleMenu = (id) => {
+    menu = menu === id ? null : id
+    armed = false
+  }
+
+  const submit = async (name) => {
+    if (dialog.project) await ProjectStore.rename(dialog.project.id, name)
+    else await ProjectStore.create(name)
+    dialog = null
+    await refresh()
+  }
+
+  const remove = async (project) => {
+    if (!armed) return (armed = true)
+    await ProjectStore.remove(project.id)
+    menu = null
+    await refresh()
+  }
+
+  onMount(async () => {
+    try {
+      await ProjectStore.init()
+      await refresh()
+    } catch (e) {
+      error = e.message
+    }
+  })
 </script>
 
 <div class="screen">
@@ -39,21 +74,36 @@
     </div>
 
     <div class="grid">
-      {#each projects as project (project)}
+      {#each projects as project (project.id)}
         <div class="card">
-          <button type="button" class="open">
-            <span class="thumb"><Thumb cubes={project.cubes} axes={project.axes} /></span>
+          <button type="button" class="open" onclick={() => onopen(project)}>
+            <span class="thumb"><Thumb cubes={scenes.cube} axes /></span>
             <span class="info">
               <span class="name">{project.name}</span>
-              <span class="meta">{project.edited}</span>
+              <span class="meta">{ago(project.modified)}</span>
             </span>
           </button>
-          <button type="button" class="more" aria-label="More options for {project.name}">
+          <button type="button" class="more" aria-label="More options for {project.name}" onclick={() => toggleMenu(project.id)}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.7" /><circle cx="12" cy="12" r="1.7" /><circle cx="12" cy="19" r="1.7" /></svg>
           </button>
+          {#if menu === project.id}
+            <button type="button" class="scrim" aria-label="Close menu" onclick={() => (menu = null)}></button>
+            <div class="menu">
+              <button type="button" onclick={() => ((dialog = { project }), (menu = null))}>Rename</button>
+              <button type="button" class:danger={armed} onclick={() => remove(project)}>
+                {armed ? 'Tap again to delete' : 'Delete'}
+              </button>
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
+
+    {#if error}
+      <p class="note error">{error}</p>
+    {:else if !projects.length}
+      <p class="note">No projects yet. Tap New Project to create one.</p>
+    {/if}
   </main>
 
   <footer>
@@ -63,14 +113,20 @@
       <span aria-hidden="true">·</span>
       <span>{projects.length} projects</span>
     </div>
-    <button type="button" class="fab" onclick={() => (creating = true)}>
+    <button type="button" class="fab" onclick={() => (dialog = {})}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
       New Project
     </button>
   </footer>
 
-  {#if creating}
-    <NewProjectDialog oncreate={create} oncancel={() => (creating = false)} />
+  {#if dialog}
+    <ProjectDialog
+      title={dialog.project ? 'Rename project' : 'New project'}
+      action={dialog.project ? 'Rename' : 'Create'}
+      value={dialog.project?.name}
+      onsubmit={submit}
+      oncancel={() => (dialog = null)}
+    />
   {/if}
 </div>
 
@@ -229,6 +285,54 @@
     border: 0;
     border-radius: 12px;
     color: #9a9ea8;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .menu {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    background: #25272e;
+    border: 1px solid #3a3d46;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .menu button {
+    height: 44px;
+    padding: 0 14px;
+    background: none;
+    border: 0;
+    color: #ececef;
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .menu .danger {
+    color: #e5675f;
+  }
+
+  .note {
+    margin: 24px 0 0;
+    text-align: center;
+    font-size: 13px;
+    color: #9a9ea8;
+  }
+
+  .note.error {
+    color: #e5675f;
   }
 
   footer {

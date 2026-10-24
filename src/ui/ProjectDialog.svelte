@@ -1,17 +1,22 @@
 <script>
-  let { oncreate, oncancel } = $props()
+  let { title = 'New project', action = 'Create', value = 'Untitled animation', onsubmit, oncancel } = $props()
 
-  let name = $state('Untitled animation')
+  let name = $state(value)
+  let error = $state('')
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    oncreate(name.trim() || 'Untitled animation')
+    try {
+      await onsubmit(name.trim() || 'Untitled animation')
+    } catch (err) {
+      error = err.message
+    }
   }
 </script>
 
 <div class="scrim">
-  <form class="dialog" role="dialog" aria-label="New project" onsubmit={submit}>
-    <h2>New project</h2>
+  <form class="dialog" role="dialog" aria-label={title} onsubmit={submit}>
+    <h2>{title}</h2>
     <div class="field">
       <label for="project-name">Project name</label>
       <!-- svelte-ignore a11y_autofocus -->
@@ -20,10 +25,11 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg>
         <span>MineMotion/projects/{name.trim() || 'Untitled animation'}/</span>
       </div>
+      {#if error}<div class="error">{error}</div>{/if}
     </div>
     <div class="actions">
       <button type="button" class="ghost" onclick={oncancel}>Cancel</button>
-      <button type="submit" class="accent">Create</button>
+      <button type="submit" class="accent">{action}</button>
     </div>
   </form>
 </div>
@@ -109,6 +115,11 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     font-family: ui-monospace, 'JetBrains Mono', monospace;
+  }
+
+  .error {
+    font-size: 12px;
+    color: #e5675f;
   }
 
   .actions {
