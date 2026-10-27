@@ -40,6 +40,7 @@ jobs:
 
       - name: Apply native customizations
         run: |
+          find android/app/src/main/res -name splash.png -delete
           cp -r resources/res/. android/app/src/main/res/
           cp resources/MainActivity.java android/app/src/main/java/com/minemotion/app/MainActivity.java
           bash resources/patch-manifest.sh
