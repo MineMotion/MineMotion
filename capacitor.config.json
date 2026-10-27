@@ -2,5 +2,8 @@
   "appId": "com.minemotion.app",
   "appName": "MineMotion",
   "webDir": "dist",
-  "backgroundColor": "#1e1f24"
+  "backgroundColor": "#1e1f24",
+  "server": {
+    "allowNavigation": ["minemotion.github.io"]
+  }
 }

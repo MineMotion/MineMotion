@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>MineMotion</title>
+    <script>
+      if (location.protocol === 'https:' && location.hostname === 'localhost') {
+        fetch('https://minemotion.github.io/minemotion/', { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) })
+          .then(() => location.replace('https://minemotion.github.io/minemotion/'))
+          .catch(() => {});
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
