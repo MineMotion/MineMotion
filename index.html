@@ -6,9 +6,10 @@
     <title>MineMotion</title>
     <script>
       if (location.protocol === 'https:' && location.hostname === 'localhost') {
-        fetch('https://minemotion.github.io/minemotion/', { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) })
-          .then(() => location.replace('https://minemotion.github.io/minemotion/'))
-          .catch(() => {});
+        const remote = 'https://minemotion.github.io/MineMotion/'
+        fetch(remote, { cache: 'no-store', signal: AbortSignal.timeout(3000) })
+          .then((res) => res.ok && location.replace(remote))
+          .catch(() => {})
       }
     </script>
     <script type="module" crossorigin src="./assets/index-Cs_DlPYQ.js"></script>
