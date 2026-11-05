@@ -10,10 +10,23 @@ import {
   Scene as ThreeScene
 } from 'three'
 
+const createMaterial = ({ color, texture }, assets, repeat = 1) => {
+  const material = new MeshStandardMaterial({ color })
+  if (texture) {
+    material.map = assets.texture(texture).clone()
+    material.map.repeat.set(repeat, repeat)
+    material.map.needsUpdate = true
+  }
+  return material
+}
+
 const builders = {
-  block: ({ color }) => new Mesh(new BoxGeometry(), new MeshStandardMaterial({ color })),
-  plane: ({ color, size }) =>
-    new Mesh(new PlaneGeometry(size, size).rotateX(-Math.PI / 2), new MeshStandardMaterial({ color }))
+  block: (data, assets) => new Mesh(new BoxGeometry(), createMaterial(data, assets)),
+  plane: (data, assets) =>
+    new Mesh(
+      new PlaneGeometry(data.size, data.size).rotateX(-Math.PI / 2),
+      createMaterial(data, assets, data.size)
+    )
 }
 
 const defaults = {
@@ -28,12 +41,14 @@ const defaultEnvironment = { sky: 0x78a7ff, fog: { near: 10, far: 45 } }
 
 export class Scene {
   #events
+  #assets
   #root = new ThreeScene()
   #items = new Map()
   #environment = defaultEnvironment
 
-  constructor(events) {
+  constructor(events, assets) {
     this.#events = events
+    this.#assets = assets
 
     const sun = new DirectionalLight(0xffffff, 1.6)
     sun.position.set(3, 6, 4)
@@ -108,7 +123,7 @@ export class Scene {
 
   #create(data) {
     const item = { ...defaults, ...data, id: data.id ?? crypto.randomUUID() }
-    const entry = { data: item, mesh: builders[item.type](item) }
+    const entry = { data: item, mesh: builders[item.type](item, this.#assets) }
     this.#apply(entry)
     this.#root.add(entry.mesh)
     this.#items.set(item.id, entry)
@@ -125,6 +140,7 @@ export class Scene {
   #destroy({ mesh }) {
     this.#root.remove(mesh)
     mesh.geometry.dispose()
+    mesh.material.map?.dispose()
     mesh.material.dispose()
   }
 

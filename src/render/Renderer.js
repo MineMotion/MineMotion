@@ -1,15 +1,12 @@
 import { PerspectiveCamera, WebGLRenderer } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { installHeightFog } from './HeightFog.js'
 
 export class Renderer {
   #canvas
   #renderer
   #observer
 
-  constructor(canvas, { fogCeiling }) {
-    installHeightFog(fogCeiling)
-
+  constructor(canvas) {
     this.#canvas = canvas
     this.camera = new PerspectiveCamera(60, 1, 0.1, 300)
     this.camera.position.set(4, 3, 6)
